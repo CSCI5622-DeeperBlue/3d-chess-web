@@ -1,0 +1,10 @@
+<component name="libraryTable">
+  <library name="Redist">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/ref  code/Babylon.js-master/Exporters/FBX/Redist/babylon fbx tools x86.zip!/" />
+      <root url="jar://$PROJECT_DIR$/ref  code/Babylon.js-master/Exporters/FBX/Redist/babylon fbx tools x64.zip!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

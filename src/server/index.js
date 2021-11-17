@@ -1,10 +1,10 @@
+const { spawn } = require('child_process');
 const express = require("express");
 const os = require("os");
 const bodyParser = require("body-parser");
 
 const app = express();
 let GameState = require("./GameState");
-
 
 console.log("starting");
 app.use(express.static("dist"));
@@ -13,6 +13,14 @@ app.use(bodyParser.json());
 
 //create a default game
 let Game = new GameState.GameState();
+const child = spawn('lc0',{shell:true});
+child.stdin.setEncoding = 'utf-8';
+child.stdout.pipe(process.stdout);
+child.stderr.pipe(process.stdout);
+
+child.stdin.cork();
+child.stdin.write("isready\n");
+child.stdin.uncork();
 
 app.use(express.static("dist"));
 
@@ -49,7 +57,12 @@ app.post("/api/movePiece", (req, res) =>
   }
 );
 
-app.listen(8085, "0.0.0.0", () => console.log("Listening on port 8085!"));
+app.get("/api/lc0/getBestMove", (req,res) =>
+    {
 
+    }
+);
+
+app.listen(8085, "0.0.0.0", () => console.log("Listening on port 8085!"));
 
 

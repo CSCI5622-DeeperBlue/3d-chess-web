@@ -157,8 +157,15 @@ export default class Board extends React.Component {
         this.state.blackScoreDisplay = blackScoreDisplay;
 
         var inputTextDisplay = new GUI.InputText();
-        inputTextDisplay.text = "Enter coordinates of piece to move";
+        inputTextDisplay.text="";
         inputTextDisplay.background = "white";
+        inputTextDisplay.color = "black";
+        inputTextDisplay.focusedBackground = "white";
+        inputTextDisplay.height="50px";
+        inputTextDisplay.textHorizontalAlignment = GUI.Control.HORIZONTAL_ALIGNMENT_LEFT;
+        inputTextDisplay.width="200px";
+        inputTextDisplay.paddingTop = "10px";
+        panel3.addControl(inputTextDisplay);
 
         let i;
         for (i = 0; i < 3; i++) {

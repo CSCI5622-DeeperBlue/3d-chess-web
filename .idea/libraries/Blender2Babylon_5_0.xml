@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="Blender2Babylon-5.0">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/ref  code/Babylon.js-master/Exporters/Blender/Blender2Babylon-5.0.zip!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
