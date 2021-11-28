@@ -33,4 +33,17 @@ export default class MoveEngine {
 
     }
 
+    getEngineResults() {
+            fetch('/api/movePiece', {
+                method: 'POST',
+                headers: {
+                    Accept: 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(move)
+            })
+                .then((res) => res.json())
+                .then((res) => {
+    }
+
 }

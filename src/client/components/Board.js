@@ -157,14 +157,27 @@ export default class Board extends React.Component {
         this.state.blackScoreDisplay = blackScoreDisplay;
 
         var inputTextDisplay = new GUI.InputText();
-        inputTextDisplay.text="";
+        inputTextDisplay.text="Enter Move";
         inputTextDisplay.background = "white";
-        inputTextDisplay.color = "black";
+        inputTextDisplay.color = "gray";
         inputTextDisplay.focusedBackground = "white";
         inputTextDisplay.height="50px";
         inputTextDisplay.textHorizontalAlignment = GUI.Control.HORIZONTAL_ALIGNMENT_LEFT;
         inputTextDisplay.width="200px";
         inputTextDisplay.paddingTop = "10px";
+        inputTextDisplay.onFocusObservable.add(() => {
+            if (inputTextDisplay.text == "Enter Move") {
+                inputTextDisplay.color = "black";
+                inputTextDisplay.text = "";
+            }
+        });
+        inputTextDisplay.onKeyboardEventProcessedObservable.add((input) => {
+            if (input.key == "Enter") {
+                this.textMove(inputTextDisplay.text);
+                inputTextDisplay.text = "Enter Move";
+                inputTextDisplay.color = "gray";
+            }
+        })
         panel3.addControl(inputTextDisplay);
 
         let i;
@@ -190,49 +203,51 @@ export default class Board extends React.Component {
     // checks if the move is valid and moves it if so.
     layerClickCallback(a, b, c) {
         if (this.state.activePieceID) {
-            let move = {
-                pieceID: this.state.activePieceID,
-                a,
-                b,
-                c
-            }
-
-            fetch('/api/movePiece', {
-                method: 'POST',
-                headers: {
-                    Accept: 'application/json',
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(move)
-            })
-                .then((res) => res.json())
-                .then((res) => {
-                    if (res.moveValid) {
-                        console.log(res)
-                        this.state.layers[c].setSelected(a, b)
-                        let p = this.getPieceByID(move.pieceID);
-                        if (p) {
-                            this.pieceAnimateMove(p, this.state.coordinates[move.a][move.b][move.c])
-                        }
-
-                        //in the piece is   capture remove from board.
-                        if (res.capturedPiece) {
-                            this.removePieceByID(res.capturedPiece)
-                        }
-                        if(res.whiteCheckmated) {
-                        this.state.moveDisplay.text = "Black Wins"
-                        } else if(res.blackCheckmated) {
-                            this.state.moveDisplay.text = "White Wins"
-                        } else {
-                            res.whiteMove? this.state.moveDisplay.text = "White Move" :this.state.moveDisplay.text = "Black Move"
-                        }
-                        this.state.whiteScoreDisplay.text = 'White Score is ' + res.score.whiteScore.toString()
-                        this.state.blackScoreDisplay.text = 'Black Score is ' + res.score.blackScore.toString()
-
-                    }
-
-                }
-                )
+//            let move = {
+//                pieceID: this.state.activePieceID,
+//                a,
+//                b,
+//                c
+//            }
+            let move = this.getLAN(this.state.activePieceID,a,b,c);
+            console.log(move);
+            this.textMove(move);
+//            fetch('/api/movePiece', {
+//                method: 'POST',
+//                headers: {
+//                    Accept: 'application/json',
+//                    'Content-Type': 'application/json'
+//                },
+//                body: JSON.stringify(move)
+//            })
+//                .then((res) => res.json())
+//                .then((res) => {
+//                    if (res.moveValid) {
+//                        console.log(res)
+//                        this.state.layers[c].setSelected(a, b)
+//                        let p = this.getPieceByID(move.pieceID);
+//                        if (p) {
+//                            this.pieceAnimateMove(p, this.state.coordinates[move.a][move.b][move.c])
+//                        }
+//
+//                        //in the piece is   capture remove from board.
+//                        if (res.capturedPiece) {
+//                            this.removePieceByID(res.capturedPiece)
+//                        }
+//                        if(res.whiteCheckmated) {
+//                        this.state.moveDisplay.text = "Black Wins"
+//                        } else if(res.blackCheckmated) {
+//                            this.state.moveDisplay.text = "White Wins"
+//                        } else {
+//                            res.whiteMove? this.state.moveDisplay.text = "White Move" :this.state.moveDisplay.text = "Black Move"
+//                        }
+//                        this.state.whiteScoreDisplay.text = 'White Score is ' + res.score.whiteScore.toString()
+//                        this.state.blackScoreDisplay.text = 'Black Score is ' + res.score.blackScore.toString()
+//
+//                    }
+//
+//                }
+//                )
         }
     }
 
@@ -332,6 +347,152 @@ export default class Board extends React.Component {
         this.state.activePieceID = ''
 
     }
+
+    getCoordinates(input) {
+        let coordinates = {a:input.toLowerCase().charCodeAt(0) - 97,b:(parseInt(input[1])-1),c:input[2].toUpperCase()};
+        switch(coordinates.c) {
+            case 'L':
+                coordinates.c = 0;
+                break;
+            case 'M':
+                coordinates.c = 1;
+                break;
+            case 'U':
+                coordinates.c = 2;
+                break;
+            default:
+                coordinates.c = "error";
+                break;
+        }
+        console.log(coordinates);
+        return coordinates;
+    }
+
+    getPieceFromCoordinates(a,b,c) {
+        let check = 0;
+        if (this.state.board.whiteMove) {
+            check = this.state.board.whitePieces;
+        } else {
+            check = this.state.board.blackPieces;
+        }
+        for (let i = 0; i < check.length; i++) {
+            if(check[i].a == a && check[i].b == b && check[i].c == c) {
+                return check[i].pieceID;
+            }
+        }
+        console.log(check);
+        console.log("No piece at coordinates");
+    }
+
+    setPieceCoordinates(pid,a,b,c) {
+        if (pid[0] == 'w') {
+            for (let i = 0; i < this.state.board.whitePieces.length; i++) {
+                if(this.state.board.whitePieces[i].pieceID == pid) {
+                    this.state.board.whitePieces[i].a = a;
+                    this.state.board.whitePieces[i].b = b;
+                    this.state.board.whitePieces[i].c = c;
+                }
+            }
+        } else {
+            for (let i = 0; i < this.state.board.blackPieces.length; i++) {
+                if(this.state.board.blackPieces[i].pieceID == pid) {
+                    this.state.board.blackPieces[i].a = a;
+                    this.state.board.blackPieces[i].b = b;
+                    this.state.board.blackPieces[i].c = c;
+                }
+            }
+        }
+    }
+
+    getLAN(pid,a,b,c) {
+        let check = 0;
+        let lan = "";
+        if (pid[0] == 'w') {
+            check = this.state.board.whitePieces;
+        } else {
+            check = this.state.board.blackPieces;
+        }
+        for (let i = 0; i < check.length; i++) {
+            if(check[i].pieceID == pid) {
+                lan += String.fromCharCode(97 + check[i].a) + (check[i].b+1)
+                switch(check[i].c) {
+                    case 0:
+                        lan += "l";
+                        break;
+                    case 1:
+                        lan += "m";
+                        break;
+                    case 2:
+                        lan += "u";
+                        break;
+                }
+            }
+        }
+        lan += String.fromCharCode(97 + a) + (b+1)
+        switch(c) {
+             case 0:
+                lan += "l";
+                break;
+             case 1:
+                lan += "m";
+                break;
+             case 2:
+                lan += "u";
+                break;
+        }
+        return lan;
+    }
+
+    textMove(input) {
+                if (input.length != 6) {
+                    console.log(input + " is not a valid move.");
+                } else {
+                    let piece = this.getCoordinates(input.substring(0,3));
+                    let move = this.getCoordinates(input.substring(3,6));
+                    if (move.c == "error" || move.a < 0 || move.b < 0 || move.a > 7 || move.b > 7 || piece.c == "error" || piece.a < 0 || piece.b < 0 || piece.a > 7 || piece.b > 7) {
+                        console.log(input + " is not a valid move.");
+                    } else {
+                        let pid = this.getPieceFromCoordinates(piece.a,piece.b,piece.c);
+                        move.pieceID = pid;
+                        fetch('/api/movePiece', {
+                            method: 'POST',
+                            headers: {
+                                Accept: 'application/json',
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify(move)
+                        })
+                            .then((res) => res.json())
+                            .then((res) => {
+                                if (res.moveValid) {
+                                    console.log(res)
+                                    let p = this.getPieceByID(move.pieceID);
+                                    if (p) {
+                                        this.pieceAnimateMove(p, this.state.coordinates[move.a][move.b][move.c]);
+                                        this.setPieceCoordinates(move.pieceID,move.a,move.b,move.c);
+                                        this.state.board.whiteMove = res.whiteMove;
+                                    }
+                                    //in the piece is   capture remove from board.
+                                    if (res.capturedPiece) {
+                                        this.removePieceByID(res.capturedPiece)
+                                    }
+                                    if(res.whiteCheckmated) {
+                                    this.state.moveDisplay.text = "Black Wins"
+                                    } else if(res.blackCheckmated) {
+                                        this.state.moveDisplay.text = "White Wins"
+                                    } else {
+                                        res.whiteMove? this.state.moveDisplay.text = "White Move" :this.state.moveDisplay.text = "Black Move"
+                                    }
+                                    this.state.whiteScoreDisplay.text = 'White Score is ' + res.score.whiteScore.toString()
+                                    this.state.blackScoreDisplay.text = 'Black Score is ' + res.score.blackScore.toString()
+                                }
+
+                            }
+                            )
+                    }
+                }
+    }
+
     render() {
         return (<div className="App-layer" >
             <

@@ -17,9 +17,11 @@ const child = spawn('lc0',{shell:true});
 child.stdin.setEncoding = 'utf-8';
 child.stdout.pipe(process.stdout);
 child.stderr.pipe(process.stdout);
-
 child.stdin.cork();
-child.stdin.write("isready\n");
+child.stdin.write("position startpos moves d2d4\n");
+child.stdin.uncork();
+child.stdin.cork();
+child.stdin.write("go\n");
 child.stdin.uncork();
 
 app.use(express.static("dist"));
@@ -53,11 +55,30 @@ app.get("/api/engine/getPieceInformation", (req, res) =>
 app.post("/api/movePiece", (req, res) =>
   {
     let move = req.body
+     child.stdin.cork();
+     child.stdin.write("position startpos moves "+ move + "\n");
+     child.stdin.uncork();
+     child.stdin.cork();
+     child.stdin.write("go\n");
+     child.stdin.uncork();
     res.send(Game.movePiece(move.pieceID, move))
   }
 );
 
-app.get("/api/lc0/getBestMove", (req,res) =>
+//expect a JSON object of the type: {pieceID,a,b,c}
+app.post("/api/engineMovePiece",(req,res) =>
+    {
+     let move = req.body
+     child.stdin.cork();
+     child.stdin.write("position startpos moves "+ move + "\n");
+     child.stdin.uncork();
+     child.stdin.cork();
+     child.stdin.write("go\n");
+     child.stdin.uncork();
+    }
+);
+
+app.post("/api/lc0/getBestMove", (req,res) =>
     {
 
     }
