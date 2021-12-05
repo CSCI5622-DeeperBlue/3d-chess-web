@@ -156,6 +156,19 @@ export default class Board extends React.Component {
         panel3.addControl(blackScoreDisplay);
         this.state.blackScoreDisplay = blackScoreDisplay;
 
+        var button = new GUI.Button.CreateSimpleButton("but", "Start");
+        button.height = "40px";
+        button.background = "gray";
+        button.color="white";
+        button.onPointerClickObservable.add(function() {
+            fetch("/api/startEngine")
+            .then((res) => res.json())
+            .then((data) => {
+                console.log(data);
+            });
+        });
+        panel3.addControl(button);
+
         var inputTextDisplay = new GUI.InputText();
         inputTextDisplay.text="Enter Move";
         inputTextDisplay.background = "white";
@@ -460,7 +473,7 @@ export default class Board extends React.Component {
                                 Accept: 'application/json',
                                 'Content-Type': 'application/json'
                             },
-                            body: JSON.stringify(move)
+                            body: JSON.stringify({move:move,text:this.getLAN(move.pieceID,move.a,move.b,move.c)})
                         })
                             .then((res) => res.json())
                             .then((res) => {
