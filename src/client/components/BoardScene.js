@@ -15,7 +15,7 @@ export default class BoardScene extends React.Component {
 
   constructor(props) {
     super(props);
-    this.engine = null; 
+    this.engine = null;
     this.scene = null;
     this.canvas = null;
   }
@@ -26,7 +26,7 @@ export default class BoardScene extends React.Component {
     }
   }
 
-  //initializes board. 
+  //initializes board.
   componentDidMount () {
     this.engine = new BABYLON.Engine(
         this.canvas,
@@ -37,6 +37,15 @@ export default class BoardScene extends React.Component {
 
     let scene = new BABYLON.Scene(this.engine);
     this.scene = scene;
+
+    // fetch("/api/engine/getBoard")
+    // .then((res) => res.json())
+    // .then((res) => .board= res.board)
+    // .then (
+    //     console.log(this.state.board))
+    // .then (
+    //     // this.state.sceneHandler.drawBoard(this.state.board, this.pieceClickCallback)
+    // )
 
     if (typeof this.props.onSceneMount === 'function') {
       this.props.onSceneMount({
@@ -61,7 +70,7 @@ export default class BoardScene extends React.Component {
       this.canvas = c;
     }
   }
-  
+
   render () {
     // 'rest' can contain additional properties that you can flow through to canvas:
     // (id, className, etc.)
