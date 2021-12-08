@@ -150,8 +150,6 @@ class GameState {
     piece.firstMove = false;
     this.board.whiteMove ? this.board.whitePieces.splice(pieceIndex, 1, piece) : this.board.blackPieces.splice(pieceIndex, 1, piece) // update moved piece
 
-
-
     res.moveValid = true;
 
     console.log(`#wp ${this.board.whitePieces.length} #bp ${this.board.blackPieces.length}`)
