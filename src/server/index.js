@@ -48,6 +48,15 @@ app.get("/api/engine/getPieceInformation", (req, res) =>
   }
 );
 
+
+app.get("/api/toggleDimension", (req, res) =>
+  {
+    Game.toggleDim();
+    Engine.toggleDim();
+    return res.send({'status':200});
+  }
+);
+
 app.post("/api/startEngine",(req,res) =>
     { 
         Engine.initializeGame();
