@@ -1,6 +1,8 @@
 ## Overview
 
-This is a chess client that interfaces to a local npm server with a rule engine for 3d Chess. It uses Babylonjs to display the board, and React for the front end.
+This is a chess client that interfaces to a local npm server with a rule engine for 3d Chess. It uses Babylonjs to display the board, and React for the front end. Make sure to toggle to 2D before getting engine move or running auto play (Support for 3D board in progress). 
+
+https://user-images.githubusercontent.com/70385444/145742502-4cc925ea-73b9-4532-ada7-964ae5f4b788.mp4
 
 ## Getting Started
 
