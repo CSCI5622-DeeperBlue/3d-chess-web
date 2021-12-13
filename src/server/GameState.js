@@ -26,89 +26,110 @@ Object.freeze(PIECE_TYPES);
 class GameState {
   constructor() {
     // initializes all pieces
-    // const whitePieces = [
-    //   { pieceID: 'wkr', a: 0, b: 0, c: 1, type: PIECE_TYPES.rook, firstMove: true },
-    //   { pieceID: 'wkk', a: 1, b: 0, c: 1, type: PIECE_TYPES.knight, firstMove: true },
-    //   { pieceID: 'wkb', a: 2, b: 0, c: 1, type: PIECE_TYPES.bishop, firstMove: true },
-    //   { pieceID: 'wk', a: 3, b: 0, c: 1, type: PIECE_TYPES.king, firstMove: true },
-    //   { pieceID: 'wq', a: 4, b: 0, c: 1, type: PIECE_TYPES.queen, firstMove: true },
-    //   { pieceID: 'wqb', a: 5, b: 0, c: 1, type: PIECE_TYPES.bishop, firstMove: true },
-    //   { pieceID: 'wqk', a: 6, b: 0, c: 1, type: PIECE_TYPES.knight, firstMove: true },
-    //   { pieceID: 'wqr', a: 7, b: 0, c: 1, type: PIECE_TYPES.rook, firstMove: true },
-    //   { pieceID: 'wp1', a: 0, b: 1, c: 1, type: PIECE_TYPES.pawn, firstMove: true },
-    //   { pieceID: 'wp2', a: 1, b: 1, c: 1, type: PIECE_TYPES.pawn, firstMove: true },
-    //   { pieceID: 'wp3', a: 2, b: 1, c: 1, type: PIECE_TYPES.pawn, firstMove: true },
-    //   { pieceID: 'wp4', a: 3, b: 1, c: 1, type: PIECE_TYPES.pawn, firstMove: true },
-    //   { pieceID: 'wp5', a: 4, b: 1, c: 1, type: PIECE_TYPES.pawn, firstMove: true },
-    //   { pieceID: 'wp6', a: 5, b: 1, c: 1, type: PIECE_TYPES.pawn, firstMove: true },
-    //   { pieceID: 'wp7', a: 6, b: 1, c: 1, type: PIECE_TYPES.pawn, firstMove: true },
-    //   { pieceID: 'wp8', a: 7, b: 1, c: 1, type: PIECE_TYPES.pawn, firstMove: true }
-    // ];
 
-    // const blackPieces = [
-    //   { pieceID: 'bkr', a: 0, b: 7, c: 1, type: PIECE_TYPES.rook, firstMove: true },
-    //   { pieceID: 'bkk', a: 1, b: 7, c: 1, type: PIECE_TYPES.knight, firstMove: true },
-    //   { pieceID: 'bkb', a: 2, b: 7, c: 1, type: PIECE_TYPES.bishop, firstMove: true },
-    //   { pieceID: 'bk', a: 3, b: 7, c: 1, type: PIECE_TYPES.king, firstMove: true },
-    //   { pieceID: 'bq', a: 4, b: 7, c: 1, type: PIECE_TYPES.queen, firstMove: true },
-    //   { pieceID: 'bqb', a: 5, b: 7, c: 1, type: PIECE_TYPES.bishop, firstMove: true },
-    //   { pieceID: 'bqk', a: 6, b: 7, c: 1, type: PIECE_TYPES.knight, firstMove: true },
-    //   { pieceID: 'bqr', a: 7, b: 7, c: 1, type: PIECE_TYPES.rook, firstMove: true },
-    //   { pieceID: 'bp1', a: 0, b: 6, c: 1, type: PIECE_TYPES.pawn, firstMove: true },
-    //   { pieceID: 'bp2', a: 1, b: 6, c: 1, type: PIECE_TYPES.pawn, firstMove: true },
-    //   { pieceID: 'bp3', a: 2, b: 6, c: 1, type: PIECE_TYPES.pawn, firstMove: true },
-    //   { pieceID: 'bp4', a: 3, b: 6, c: 1, type: PIECE_TYPES.pawn, firstMove: true },
-    //   { pieceID: 'bp5', a: 4, b: 6, c: 1, type: PIECE_TYPES.pawn, firstMove: true },
-    //   { pieceID: 'bp6', a: 5, b: 6, c: 1, type: PIECE_TYPES.pawn, firstMove: true },
-    //   { pieceID: 'bp7', a: 6, b: 6, c: 1, type: PIECE_TYPES.pawn, firstMove: true },
-    //   { pieceID: 'bp8', a: 7, b: 6, c: 1, type: PIECE_TYPES.pawn, firstMove: true }
-    // ];
+    this.board = this.getStartingBoard();
+    this.dimension = "2D";
+  }
 
-    const whitePieces = [
-      { pieceID: 'wkr', a: 0, b: 0, c: 0, type: PIECE_TYPES.rook, firstMove: true },
-      { pieceID: 'wkk', a: 1, b: 0, c: 0, type: PIECE_TYPES.knight, firstMove: true },
-      { pieceID: 'wkb', a: 2, b: 0, c: 0, type: PIECE_TYPES.bishop, firstMove: true },
-      { pieceID: 'wk', a: 3, b: 0, c: 0, type: PIECE_TYPES.king, firstMove: true },
-      { pieceID: 'wq', a: 4, b: 0, c: 0, type: PIECE_TYPES.queen, firstMove: true },
-      { pieceID: 'wqb', a: 5, b: 0, c: 0, type: PIECE_TYPES.bishop, firstMove: true },
-      { pieceID: 'wqk', a: 6, b: 0, c: 0, type: PIECE_TYPES.knight, firstMove: true },
-      { pieceID: 'wqr', a: 7, b: 0, c: 0, type: PIECE_TYPES.rook, firstMove: true },
-      { pieceID: 'wp1', a: 0, b: 1, c: 0, type: PIECE_TYPES.pawn, firstMove: true },
-      { pieceID: 'wp2', a: 1, b: 1, c: 0, type: PIECE_TYPES.pawn, firstMove: true },
-      { pieceID: 'wp3', a: 2, b: 1, c: 0, type: PIECE_TYPES.pawn, firstMove: true },
-      { pieceID: 'wp4', a: 3, b: 1, c: 0, type: PIECE_TYPES.pawn, firstMove: true },
-      { pieceID: 'wp5', a: 4, b: 1, c: 0, type: PIECE_TYPES.pawn, firstMove: true },
-      { pieceID: 'wp6', a: 5, b: 1, c: 0, type: PIECE_TYPES.pawn, firstMove: true },
-      { pieceID: 'wp7', a: 6, b: 1, c: 0, type: PIECE_TYPES.pawn, firstMove: true },
-      { pieceID: 'wp8', a: 7, b: 1, c: 0, type: PIECE_TYPES.pawn, firstMove: true }
-    ];
+  getStartingBoard() {
+    let whitePieces = [];
+    let blackPieces = [];
+    if (this.dimension == "2D") {
+      whitePieces = [
+        { pieceID: 'wkr', a: 0, b: 0, c: 1, type: PIECE_TYPES.rook, firstMove: true },
+        { pieceID: 'wkk', a: 1, b: 0, c: 1, type: PIECE_TYPES.knight, firstMove: true },
+        { pieceID: 'wkb', a: 2, b: 0, c: 1, type: PIECE_TYPES.bishop, firstMove: true },
+        { pieceID: 'wk', a: 3, b: 0, c: 1, type: PIECE_TYPES.king, firstMove: true },
+        { pieceID: 'wq', a: 4, b: 0, c: 1, type: PIECE_TYPES.queen, firstMove: true },
+        { pieceID: 'wqb', a: 5, b: 0, c: 1, type: PIECE_TYPES.bishop, firstMove: true },
+        { pieceID: 'wqk', a: 6, b: 0, c: 1, type: PIECE_TYPES.knight, firstMove: true },
+        { pieceID: 'wqr', a: 7, b: 0, c: 1, type: PIECE_TYPES.rook, firstMove: true },
+        { pieceID: 'wp1', a: 0, b: 1, c: 1, type: PIECE_TYPES.pawn, firstMove: true },
+        { pieceID: 'wp2', a: 1, b: 1, c: 1, type: PIECE_TYPES.pawn, firstMove: true },
+        { pieceID: 'wp3', a: 2, b: 1, c: 1, type: PIECE_TYPES.pawn, firstMove: true },
+        { pieceID: 'wp4', a: 3, b: 1, c: 1, type: PIECE_TYPES.pawn, firstMove: true },
+        { pieceID: 'wp5', a: 4, b: 1, c: 1, type: PIECE_TYPES.pawn, firstMove: true },
+        { pieceID: 'wp6', a: 5, b: 1, c: 1, type: PIECE_TYPES.pawn, firstMove: true },
+        { pieceID: 'wp7', a: 6, b: 1, c: 1, type: PIECE_TYPES.pawn, firstMove: true },
+        { pieceID: 'wp8', a: 7, b: 1, c: 1, type: PIECE_TYPES.pawn, firstMove: true }
+      ];
 
-    const blackPieces = [
-      { pieceID: 'bkr', a: 0, b: 7, c: 2, type: PIECE_TYPES.rook, firstMove: true },
-      { pieceID: 'bkk', a: 1, b: 7, c: 2, type: PIECE_TYPES.knight, firstMove: true },
-      { pieceID: 'bkb', a: 2, b: 7, c: 2, type: PIECE_TYPES.bishop, firstMove: true },
-      { pieceID: 'bk', a: 3, b: 7, c: 2, type: PIECE_TYPES.king, firstMove: true },
-      { pieceID: 'bq', a: 4, b: 7, c: 2, type: PIECE_TYPES.queen, firstMove: true },
-      { pieceID: 'bqb', a: 5, b: 7, c: 2, type: PIECE_TYPES.bishop, firstMove: true },
-      { pieceID: 'bqk', a: 6, b: 7, c: 2, type: PIECE_TYPES.knight, firstMove: true },
-      { pieceID: 'bqr', a: 7, b: 7, c: 2, type: PIECE_TYPES.rook, firstMove: true },
-      { pieceID: 'bp1', a: 0, b: 6, c: 2, type: PIECE_TYPES.pawn, firstMove: true },
-      { pieceID: 'bp2', a: 1, b: 6, c: 2, type: PIECE_TYPES.pawn, firstMove: true },
-      { pieceID: 'bp3', a: 2, b: 6, c: 2, type: PIECE_TYPES.pawn, firstMove: true },
-      { pieceID: 'bp4', a: 3, b: 6, c: 2, type: PIECE_TYPES.pawn, firstMove: true },
-      { pieceID: 'bp5', a: 4, b: 6, c: 2, type: PIECE_TYPES.pawn, firstMove: true },
-      { pieceID: 'bp6', a: 5, b: 6, c: 2, type: PIECE_TYPES.pawn, firstMove: true },
-      { pieceID: 'bp7', a: 6, b: 6, c: 2, type: PIECE_TYPES.pawn, firstMove: true },
-      { pieceID: 'bp8', a: 7, b: 6, c: 2, type: PIECE_TYPES.pawn, firstMove: true }
-    ];
-
-    this.startWhite = whitePieces;
-    this.startBlack = blackPieces;
-    this.board = {
+      blackPieces = [
+        { pieceID: 'bkr', a: 0, b: 7, c: 1, type: PIECE_TYPES.rook, firstMove: true },
+        { pieceID: 'bkk', a: 1, b: 7, c: 1, type: PIECE_TYPES.knight, firstMove: true },
+        { pieceID: 'bkb', a: 2, b: 7, c: 1, type: PIECE_TYPES.bishop, firstMove: true },
+        { pieceID: 'bk', a: 3, b: 7, c: 1, type: PIECE_TYPES.king, firstMove: true },
+        { pieceID: 'bq', a: 4, b: 7, c: 1, type: PIECE_TYPES.queen, firstMove: true },
+        { pieceID: 'bqb', a: 5, b: 7, c: 1, type: PIECE_TYPES.bishop, firstMove: true },
+        { pieceID: 'bqk', a: 6, b: 7, c: 1, type: PIECE_TYPES.knight, firstMove: true },
+        { pieceID: 'bqr', a: 7, b: 7, c: 1, type: PIECE_TYPES.rook, firstMove: true },
+        { pieceID: 'bp1', a: 0, b: 6, c: 1, type: PIECE_TYPES.pawn, firstMove: true },
+        { pieceID: 'bp2', a: 1, b: 6, c: 1, type: PIECE_TYPES.pawn, firstMove: true },
+        { pieceID: 'bp3', a: 2, b: 6, c: 1, type: PIECE_TYPES.pawn, firstMove: true },
+        { pieceID: 'bp4', a: 3, b: 6, c: 1, type: PIECE_TYPES.pawn, firstMove: true },
+        { pieceID: 'bp5', a: 4, b: 6, c: 1, type: PIECE_TYPES.pawn, firstMove: true },
+        { pieceID: 'bp6', a: 5, b: 6, c: 1, type: PIECE_TYPES.pawn, firstMove: true },
+        { pieceID: 'bp7', a: 6, b: 6, c: 1, type: PIECE_TYPES.pawn, firstMove: true },
+        { pieceID: 'bp8', a: 7, b: 6, c: 1, type: PIECE_TYPES.pawn, firstMove: true }
+      ];
+    } else {
+      whitePieces = [
+        { pieceID: 'wkr', a: 0, b: 0, c: 0, type: PIECE_TYPES.rook, firstMove: true },
+        { pieceID: 'wkk', a: 1, b: 0, c: 0, type: PIECE_TYPES.knight, firstMove: true },
+        { pieceID: 'wkb', a: 2, b: 0, c: 0, type: PIECE_TYPES.bishop, firstMove: true },
+        { pieceID: 'wk', a: 3, b: 0, c: 0, type: PIECE_TYPES.king, firstMove: true },
+        { pieceID: 'wq', a: 4, b: 0, c: 0, type: PIECE_TYPES.queen, firstMove: true },
+        { pieceID: 'wqb', a: 5, b: 0, c: 0, type: PIECE_TYPES.bishop, firstMove: true },
+        { pieceID: 'wqk', a: 6, b: 0, c: 0, type: PIECE_TYPES.knight, firstMove: true },
+        { pieceID: 'wqr', a: 7, b: 0, c: 0, type: PIECE_TYPES.rook, firstMove: true },
+        { pieceID: 'wp1', a: 0, b: 1, c: 0, type: PIECE_TYPES.pawn, firstMove: true },
+        { pieceID: 'wp2', a: 1, b: 1, c: 0, type: PIECE_TYPES.pawn, firstMove: true },
+        { pieceID: 'wp3', a: 2, b: 1, c: 0, type: PIECE_TYPES.pawn, firstMove: true },
+        { pieceID: 'wp4', a: 3, b: 1, c: 0, type: PIECE_TYPES.pawn, firstMove: true },
+        { pieceID: 'wp5', a: 4, b: 1, c: 0, type: PIECE_TYPES.pawn, firstMove: true },
+        { pieceID: 'wp6', a: 5, b: 1, c: 0, type: PIECE_TYPES.pawn, firstMove: true },
+        { pieceID: 'wp7', a: 6, b: 1, c: 0, type: PIECE_TYPES.pawn, firstMove: true },
+        { pieceID: 'wp8', a: 7, b: 1, c: 0, type: PIECE_TYPES.pawn, firstMove: true }
+      ];
+  
+      blackPieces = [
+        { pieceID: 'bkr', a: 0, b: 7, c: 2, type: PIECE_TYPES.rook, firstMove: true },
+        { pieceID: 'bkk', a: 1, b: 7, c: 2, type: PIECE_TYPES.knight, firstMove: true },
+        { pieceID: 'bkb', a: 2, b: 7, c: 2, type: PIECE_TYPES.bishop, firstMove: true },
+        { pieceID: 'bk', a: 3, b: 7, c: 2, type: PIECE_TYPES.king, firstMove: true },
+        { pieceID: 'bq', a: 4, b: 7, c: 2, type: PIECE_TYPES.queen, firstMove: true },
+        { pieceID: 'bqb', a: 5, b: 7, c: 2, type: PIECE_TYPES.bishop, firstMove: true },
+        { pieceID: 'bqk', a: 6, b: 7, c: 2, type: PIECE_TYPES.knight, firstMove: true },
+        { pieceID: 'bqr', a: 7, b: 7, c: 2, type: PIECE_TYPES.rook, firstMove: true },
+        { pieceID: 'bp1', a: 0, b: 6, c: 2, type: PIECE_TYPES.pawn, firstMove: true },
+        { pieceID: 'bp2', a: 1, b: 6, c: 2, type: PIECE_TYPES.pawn, firstMove: true },
+        { pieceID: 'bp3', a: 2, b: 6, c: 2, type: PIECE_TYPES.pawn, firstMove: true },
+        { pieceID: 'bp4', a: 3, b: 6, c: 2, type: PIECE_TYPES.pawn, firstMove: true },
+        { pieceID: 'bp5', a: 4, b: 6, c: 2, type: PIECE_TYPES.pawn, firstMove: true },
+        { pieceID: 'bp6', a: 5, b: 6, c: 2, type: PIECE_TYPES.pawn, firstMove: true },
+        { pieceID: 'bp7', a: 6, b: 6, c: 2, type: PIECE_TYPES.pawn, firstMove: true },
+        { pieceID: 'bp8', a: 7, b: 6, c: 2, type: PIECE_TYPES.pawn, firstMove: true }
+      ];
+  }
+    const board = {
       whitePieces,
       blackPieces,
       whiteMove: true
     };
+    return board;
+  }
+
+  resetBoard() {
+    this.board = this.getStartingBoard();
+  }
+
+  toggleDim() {
+    if (this.dimension == "3D") {
+      this.dimension == "2D";
+    } else {
+      this.dimension == "3D";
+    }
+    this.resetBoard();
   }
 
   resetBoard() {
