@@ -17,7 +17,6 @@ export default class Board extends React.Component {
         const boardSize = 200;
         const zOffset = 50;
         const coordinates = this.generateBoardIndexes(boardSize, zOffset);
-
         this.state = {
             sceneHandle: {},
             pieces: [], //an array of meshes of the pieces,named by position
@@ -30,8 +29,8 @@ export default class Board extends React.Component {
             loader: {},
             moveDisplay: {},
             whiteScoreDisplay: {},
-            blackScoreDisplay: {}
-
+            blackScoreDisplay: {},
+            ended: false
         }
     }
 
@@ -71,8 +70,6 @@ export default class Board extends React.Component {
 
             })
     }
-
-
 
     //helper for component did mount
     //used to configure mesh after initial mesh load
@@ -156,18 +153,32 @@ export default class Board extends React.Component {
         panel3.addControl(blackScoreDisplay);
         this.state.blackScoreDisplay = blackScoreDisplay;
 
-        var button = new GUI.Button.CreateSimpleButton("but", "Start");
-        button.height = "40px";
+        var button = new GUI.Button.CreateSimpleButton("but", "Engine Move");
+        button.height = "45px";
         button.background = "gray";
         button.color="white";
-        button.onPointerClickObservable.add(function() {
-            fetch("/api/startEngine")
-            .then((res) => res.json())
-            .then((data) => {
-                console.log(data);
-            });
+        button.paddingTop="10px";
+        button.onPointerClickObservable.add( () => {
+            fetch("/api/engineMovePiece", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify()
+            })
+                .then((res) => res.json())
+                .then((data) => {this.textMove(data.opponentMove)})
+            //setTimeout(()=>{this.getBestMove()},5000);
         });
         panel3.addControl(button);
+
+        var cpu = new GUI.Button.CreateSimpleButton("but", "Auto Play");
+        cpu.height = "45px";
+        cpu.background = "gray";
+        cpu.color="white";
+        cpu.paddingTop="10px";
+        cpu.onPointerClickObservable.add( () => {this.autoPlay();});
+        panel3.addControl(cpu);
 
         var inputTextDisplay = new GUI.InputText();
         inputTextDisplay.text="Enter Move";
@@ -223,7 +234,7 @@ export default class Board extends React.Component {
 //                c
 //            }
             let move = this.getLAN(this.state.activePieceID,a,b,c);
-            console.log(move);
+            // console.log(move);
             this.textMove(move);
 //            fetch('/api/movePiece', {
 //                method: 'POST',
@@ -277,7 +288,6 @@ export default class Board extends React.Component {
                     pieceID
                 },
                 headers: {
-                    Accept: 'application/json',
                     'Content-Type': 'application/json'
                 },
             })
@@ -301,12 +311,12 @@ export default class Board extends React.Component {
             value: mesh.position
         });
         keysPiece.push({
-            frame: 120,
+            frame: 60,
             value: position
         });
         animationBox.setKeys(keysPiece);
         mesh.animations.push(animationBox);
-        this.state.sceneHandle.scene.beginAnimation(mesh, 0, 120, false);
+        this.state.sceneHandle.scene.beginAnimation(mesh, 0, 60, false);
     }
 
     // returns a list of coordinates on all three boards in. putting this here because instead of
@@ -362,7 +372,7 @@ export default class Board extends React.Component {
     }
 
     getCoordinates(input) {
-        let coordinates = {a:input.toLowerCase().charCodeAt(0) - 97,b:(parseInt(input[1])-1),c:input[2].toUpperCase()};
+        let coordinates = {a:Math.abs(input.toLowerCase().charCodeAt(0)-97-7),b:(parseInt(input[1])-1),c:input[2].toUpperCase()};
         switch(coordinates.c) {
             case 'L':
                 coordinates.c = 0;
@@ -377,7 +387,7 @@ export default class Board extends React.Component {
                 coordinates.c = "error";
                 break;
         }
-        console.log(coordinates);
+        // console.log(coordinates);
         return coordinates;
     }
 
@@ -393,7 +403,7 @@ export default class Board extends React.Component {
                 return check[i].pieceID;
             }
         }
-        console.log(check);
+        // console.log(check);
         console.log("No piece at coordinates");
     }
 
@@ -427,7 +437,8 @@ export default class Board extends React.Component {
         }
         for (let i = 0; i < check.length; i++) {
             if(check[i].pieceID == pid) {
-                lan += String.fromCharCode(97 + check[i].a) + (check[i].b+1)
+                let x = Math.abs(check[i].a-7);
+                lan += String.fromCharCode(97 + x) + (check[i].b+1);
                 switch(check[i].c) {
                     case 0:
                         lan += "l";
@@ -441,7 +452,8 @@ export default class Board extends React.Component {
                 }
             }
         }
-        lan += String.fromCharCode(97 + a) + (b+1)
+        let x = Math.abs(a-7);
+        lan += String.fromCharCode(97 + x) + (b+1)
         switch(c) {
              case 0:
                 lan += "l";
@@ -456,7 +468,49 @@ export default class Board extends React.Component {
         return lan;
     }
 
+    addLayerToLAN(move) {
+        if (move.charAt(2).toLowerCase() != 'm' && move.charAt(2).toLowerCase() != 'u' && move.charAt(2).toLowerCase() != 'l') {
+            move = move.substring(0,2) + 'm' + move.substring(2,move.length);       
+        }
+        if (move.charAt(move.length-1).toLowerCase() != 'm' && move.charAt(move.length-1).toLowerCase() != 'u' && move.charAt(move.length-1).toLowerCase() != 'l') {
+            move = move + 'm';       
+        }
+        console.log(move);
+        return move;
+    }
+
+
+    autoPlay() {
+        if (!this.state.ended) {
+            setTimeout(() => {
+                    this.getBestMove();
+                    this.autoPlay();
+            },2500);
+        }
+    }
+
+    getBestMove() {
+        console.log("Getting best move");
+        fetch("/api/engineMovePiece", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify()
+        })
+            .then((res) => res.json())
+            .then((data) => {
+                if (data.ended) {
+                    this.state.ended = true;
+                    this.state.moveDisplay.text = "Game Ended";
+                }
+                this.textMove(data.opponentMove);
+            })
+    }
+
     textMove(input) {
+                input = this.addLayerToLAN(input);
+
                 if (input.length != 6) {
                     console.log(input + " is not a valid move.");
                 } else {
@@ -467,18 +521,17 @@ export default class Board extends React.Component {
                     } else {
                         let pid = this.getPieceFromCoordinates(piece.a,piece.b,piece.c);
                         move.pieceID = pid;
+                        move.textMove = input;
                         fetch('/api/movePiece', {
                             method: 'POST',
                             headers: {
-                                Accept: 'application/json',
                                 'Content-Type': 'application/json'
                             },
-                            body: JSON.stringify({move:move,text:this.getLAN(move.pieceID,move.a,move.b,move.c)})
+                            body: JSON.stringify(move)
                         })
                             .then((res) => res.json())
                             .then((res) => {
                                 if (res.moveValid) {
-                                    console.log(res)
                                     let p = this.getPieceByID(move.pieceID);
                                     if (p) {
                                         this.pieceAnimateMove(p, this.state.coordinates[move.a][move.b][move.c]);
@@ -493,16 +546,17 @@ export default class Board extends React.Component {
                                     this.state.moveDisplay.text = "Black Wins"
                                     } else if(res.blackCheckmated) {
                                         this.state.moveDisplay.text = "White Wins"
+                                    } else if (this.state.ended) {
+                                        this.state.moveDisplay.text = "Game Ended"
                                     } else {
                                         res.whiteMove? this.state.moveDisplay.text = "White Move" :this.state.moveDisplay.text = "Black Move"
                                     }
                                     this.state.whiteScoreDisplay.text = 'White Score is ' + res.score.whiteScore.toString()
-                                    this.state.blackScoreDisplay.text = 'Black Score is ' + res.score.blackScore.toString()
+                                    this.state.blackScoreDisplay.text = 'Black Score is ' + res.score.blackScore.toString()                  
                                 }
-
-                            }
-                            )
+                            }) 
                     }
+
                 }
     }
 
