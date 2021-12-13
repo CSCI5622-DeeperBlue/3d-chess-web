@@ -153,6 +153,14 @@ export default class Board extends React.Component {
         panel3.addControl(blackScoreDisplay);
         this.state.blackScoreDisplay = blackScoreDisplay;
 
+        var dim = new GUI.Button.CreateSimpleButton("but", "Get 2D");
+        dim.height = "45px";
+        dim.background = "gray";
+        dim.color="white";
+        dim.paddingTop="10px";
+        dim.onPointerClickObservable.add( () => {this.toggle2D()});
+        panel3.addControl(dim);
+
         var button = new GUI.Button.CreateSimpleButton("but", "Engine Move");
         button.height = "45px";
         button.background = "gray";
@@ -479,6 +487,13 @@ export default class Board extends React.Component {
         return move;
     }
 
+    toggle2D() {
+        {
+            fetch("/api/toggleDimension")
+                .then((res) => res.json())
+                .then((data) => {location.reload();})
+        }
+    }
 
     autoPlay() {
         if (!this.state.ended) {
