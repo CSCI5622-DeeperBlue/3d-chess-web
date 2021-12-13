@@ -5,6 +5,9 @@ const bodyParser = require("body-parser");
 
 const app = express();
 let GameState = require("./GameState");
+let lc0 = require("./lc0");
+const path = require ( 'path' );
+const { dirname } = require("path");
 
 console.log("starting");
 app.use(express.static("dist"));
@@ -13,13 +16,11 @@ app.use(bodyParser.json());
 
 //create a default game
 let Game = new GameState.GameState();
-const child = spawn('lc0',{shell:true});
-child.stdin.setEncoding = 'utf-8';
-child.stdout.setEncoding('utf8');
-child.stdout.pipe(process.stdout);
-child.stderr.pipe(process.stdout);
+var Engine = new lc0.lc0()
+Engine.initializeGame();
 
-let moveList = ""
+let moveList = " moves";
+let depth = 5;
 
 app.use(express.static("dist"));
 
@@ -41,84 +42,44 @@ app.get("/api/engine/getBoard", (req, res) =>
 **/
 app.get("/api/engine/getPieceInformation", (req, res) =>
   {
-    let pieceID = req.params
-    console.log(pieceID)
-    res.send(Game.getPieceInformation(pieceID))
+    let pieceID = req.params;
+    console.log(pieceID);
+    res.send(Game.getPieceInformation(pieceID));
   }
 );
 
-app.get("/api/startEngine",(req,res) =>
-    {
-        //child.stdout.pipe(res);
-        moveList = "";
-        child.stdin.cork();
-        child.stdin.write("setoption name Threads value 1\n");
-        child.stdin.uncork();
-        child.stdin.cork();
-        child.stdin.write("setoption name VerboseMoveStats value false\n");
-        child.stdin.uncork();
-        child.stdin.cork();
-        child.stdin.write("setoption name Ponder value false\n");
-        child.stdin.uncork();
-        child.stdin.cork();
-        child.stdin.write("setoption name UCI_ShowWDL value false\n");
-        child.stdin.uncork();
-        child.stdin.cork();
-        child.stdin.write("ucinewgame\n");
-        child.stdin.uncork();
-        child.stdin.cork();
-        child.stdin.write("position startpos\n");
-        child.stdin.uncork();
-        child.stdin.cork();
-        child.stdin.write("go nodes 1000\n");
-        child.stdin.uncork();
-        child.stdout.on('data',function(data) {
-            res.send({data:data});
+app.post("/api/startEngine",(req,res) =>
+    { 
+        Engine.initializeGame();
+        var movePromise = Engine.movePiece();
+        movePromise.then(value => {
+          console.log("/api/StartEngine");
+          console.log(`next move is ${value.opponentMove}`);
+          res.send(value);
         });
-    }
+      }
 );
-
 
 //expect a JSON object of the type: {pieceID,a,b,c}
 app.post("/api/movePiece", (req, res) =>
   {
-     let move = req.body.move;
-     moveList += (req.body.text + " ");
-     console.log("moveList");
-     console.log(moveList);
-     child.stdin.cork();
-     child.stdin.write("position startpos moves "+ moveList + "\n");
-     child.stdin.uncork();
-     child.stdin.cork();
-     child.stdin.write("go nodes 1000\n");
-     child.stdin.uncork();
-     child.stdout.on('data',function(data) {
-        console.log(data);
-        res.send(Game.movePiece(move.pieceID,move))
-     });
-     //res.send(Game.movePiece(move.pieceID, move))
+    let move = req.body;
+    moveList += " " + move.textMove;
+    res.send(Game.movePiece(move.pieceID, move));
   }
 );
 
-//expect a JSON object of the type: {pieceID,a,b,c}
 app.post("/api/engineMovePiece",(req,res) =>
-    {
-        let move = req.body
-        child.stdout.pipe(res);
-        child.stdin.cork();
-        child.stdin.write("position startpos moves "+ move + "\n");
-        child.stdin.uncork();
-        child.stdin.cork();
-        child.stdin.write("go nodes\n");
-        child.stdin.uncork();
-        child.stdout.on('data',function(data) {
-            console.log(data);
-            res.send({data:data});
-        });
+    { 
+      console.log(moveList);
+      var movePromise = Engine.movePiece("asd",moveList);
+      movePromise.then(value => {
+        console.log("/api/StartEngine");
+        console.log(`next move is ${value.opponentMove}`);
+        res.send(value);
+      });
     }
 );
 
 
 app.listen(8085, "0.0.0.0", () => console.log("Listening on port 8085!"));
-
-
